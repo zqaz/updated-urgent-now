@@ -12,6 +12,7 @@ export const mockClinics: Clinic[] = [
     provider: "ZoomCare",
     status: "Shortest Wait",
     url: "https://www.zoomcare.com/clinic/zoomcare-south-lake-union",
+    phone: "+12069463100",
   },
   {
     id: "2",
@@ -24,6 +25,7 @@ export const mockClinics: Clinic[] = [
     provider: "UW Medicine",
     status: "High Capacity",
     url: "https://www.uwmedicine.org/locations/ballard/urgent-care",
+    phone: "+12065205000",
   },
   {
     id: "3",
@@ -36,6 +38,7 @@ export const mockClinics: Clinic[] = [
     provider: "MultiCare Indigo",
     status: "Fast Service",
     url: "https://www.multicare.org/location/indigo-urgent-care-seattle-rainier/",
+    phone: "+12538483000",
   },
   {
     id: "4",
@@ -48,6 +51,7 @@ export const mockClinics: Clinic[] = [
     provider: "ZoomCare",
     status: "Busy",
     url: "https://www.zoomcare.com/clinic/zoomcare-capitol-hill",
+    phone: "+12069463100",
   },
 ];
 

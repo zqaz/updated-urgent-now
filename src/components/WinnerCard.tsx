@@ -9,7 +9,7 @@ interface WinnerCardProps {
   onNavigate?: (clinic: Clinic) => void;
 }
 
-const networkBadge: Record<NetworkStatus, { label: string; icon: React.ReactNode; className: string } | null> = {
+const networkBadge: Record<NetworkStatus, { label: string; icon: React.ReactNode; className: string; clickable?: boolean } | null> = {
   in_network: {
     label: "In-Network",
     icon: <ShieldCheck className="w-3 h-3" />,
@@ -21,9 +21,10 @@ const networkBadge: Record<NetworkStatus, { label: string; icon: React.ReactNode
     className: "bg-alert-red/10 text-alert-red border border-alert-red/30",
   },
   call_to_verify: {
-    label: "Call to Verify",
+    label: "Tap to Call & Verify",
     icon: <PhoneCall className="w-3 h-3" />,
-    className: "bg-amber-warn/10 text-amber-warn border border-amber-warn/30",
+    className: "bg-amber-warn/10 text-amber-warn border border-amber-warn/30 cursor-pointer hover:bg-amber-warn/20 active:scale-95 transition-all",
+    clickable: true,
   },
   none: null,
 };
@@ -94,12 +95,23 @@ const WinnerCard = ({ clinic, networkStatus = "none", onNavigate }: WinnerCardPr
             )}
           </div>
 
-          {/* Insurance network badge */}
+          {/* Insurance network badge — tap to call when we have a number */}
           {badge && (
-            <div className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-2 ${badge.className}`}>
-              {badge.icon}
-              {badge.label}
-            </div>
+            badge.clickable && clinic.phone ? (
+              <a
+                href={`tel:${clinic.phone}`}
+                className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-2 min-h-[28px] items-center ${badge.className}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {badge.icon}
+                {badge.label}
+              </a>
+            ) : (
+              <div className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-2 ${badge.className}`}>
+                {badge.icon}
+                {badge.label}
+              </div>
+            )
           )}
         </div>
       </div>

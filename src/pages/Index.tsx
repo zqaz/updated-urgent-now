@@ -56,6 +56,7 @@ const Index = () => {
   const [hasRealLocation, setHasRealLocation] = useState(false);
   const [currentEntryId, setCurrentEntryId] = useState<string | null>(null);
   const [selectedInsurance, setSelectedInsurance] = useState<string | null>(null);
+  const [insuranceContinuing, setInsuranceContinuing] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showPrivacyNotice, setShowPrivacyNotice] = useState(
@@ -164,6 +165,11 @@ const Index = () => {
     setAppState("hero");
   }, []);
 
+  const handleSubmitText = useCallback((text: string) => {
+    setConfirmedTranscript(text);
+    setAppState("confirm");
+  }, []);
+
   const handleNavigateClinic = useCallback((clinic: Clinic) => {
     if (currentEntryId) recordNavigate(currentEntryId, clinic);
   }, [currentEntryId, recordNavigate]);
@@ -225,16 +231,21 @@ const Index = () => {
   }, [confirmedTranscript, toast, userLocation, addEntry, profile, fetchClinics]);
 
   const proceedWithInsurance = useCallback(async (insuranceId: string | null) => {
-    setSelectedInsurance(insuranceId);
-    const careType = pendingCareTypeRef.current;
-    await fetchClinics(careType);
-    if (careType === "critical") {
-      setShowCriticalOverlay(true);
-      setAppState("er_dashboard");
-    } else if (careType === "er") {
-      setAppState("er_dashboard");
-    } else {
-      setAppState("dashboard");
+    setInsuranceContinuing(true);
+    try {
+      setSelectedInsurance(insuranceId);
+      const careType = pendingCareTypeRef.current;
+      await fetchClinics(careType);
+      if (careType === "critical") {
+        setShowCriticalOverlay(true);
+        setAppState("er_dashboard");
+      } else if (careType === "er") {
+        setAppState("er_dashboard");
+      } else {
+        setAppState("dashboard");
+      }
+    } finally {
+      setInsuranceContinuing(false);
     }
   }, [fetchClinics]);
 
@@ -342,6 +353,7 @@ const Index = () => {
           transcript={transcript}
           micPermission={micPermission}
           onRequestMicPermission={requestMicPermission}
+          onSubmitText={handleSubmitText}
         />
       )}
 
@@ -365,6 +377,7 @@ const Index = () => {
         <InsuranceSelect
           onSelect={handleInsuranceSelect}
           onSkip={handleInsuranceSkip}
+          loading={insuranceContinuing}
           profileButton={
             <ProfileButton
               profile={profile}

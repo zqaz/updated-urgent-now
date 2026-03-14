@@ -1,5 +1,5 @@
-import { Mic, Activity, MicOff } from "lucide-react";
-import { useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
+import { Mic, Activity, MicOff, ShieldCheck, MessageCircle, Send } from "lucide-react";
 import { MicPermission } from "@/hooks/useSpeechRecognition";
 
 interface HeroScreenProps {
@@ -9,6 +9,7 @@ interface HeroScreenProps {
   transcript?: string;
   micPermission: MicPermission;
   onRequestMicPermission: () => Promise<void>;
+  onSubmitText?: (text: string) => void;
 }
 
 const WaveformBar = ({ delay }: { delay: string }) => (
@@ -25,10 +26,19 @@ const HeroScreen = ({
   transcript,
   micPermission,
   onRequestMicPermission,
+  onSubmitText,
 }: HeroScreenProps) => {
+  const [chatInput, setChatInput] = useState("");
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isHoldingRef = useRef(false);
   const holdStartedRef = useRef(false);
+
+  const handleSubmitText = useCallback(() => {
+    const trimmed = chatInput.trim();
+    if (!trimmed || !onSubmitText) return;
+    onSubmitText(trimmed);
+    setChatInput("");
+  }, [chatInput, onSubmitText]);
 
   const handlePointerDown = useCallback(() => {
     if (micPermission === "denied") return;
@@ -194,8 +204,46 @@ const HeroScreen = ({
         </div>
       )}
 
+      {/* Chat — type symptoms instead of speaking */}
+      <div className="mt-8 w-full max-w-sm">
+        <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
+          <MessageCircle className="w-3.5 h-3.5" />
+          Or type your symptoms
+        </p>
+        <div className="flex gap-2 rounded-xl border border-border bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary/30">
+          <textarea
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmitText();
+              }
+            }}
+            placeholder="e.g. sore throat and fever for 2 days"
+            rows={2}
+            className="flex-1 min-h-[52px] resize-none border-0 bg-transparent px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+            autoComplete="off"
+          />
+          <button
+            type="button"
+            onClick={handleSubmitText}
+            disabled={!chatInput.trim() || !onSubmitText}
+            className="self-end mb-2 mr-2 flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+            title="Send"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
       {/* Disclosure footer */}
       <div className="flex flex-col items-center gap-2 mt-14">
+        {/* HIPAA badge */}
+        <div className="flex items-center gap-1.5 bg-safe-green/10 border border-safe-green/30 text-safe-green text-[11px] font-semibold px-3 py-1 rounded-full mb-1">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          HIPAA Compliant
+        </div>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>End-to-End Encrypted</span>
           <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />

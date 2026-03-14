@@ -28,6 +28,16 @@ function sanitizeClinicUrl(url: unknown): string {
   return url.trim();
 }
 
+// Phone: digits and + only, 10–15 chars (E.164-ish)
+function sanitizeClinicPhone(phone: unknown): string {
+  if (typeof phone !== "string") return "";
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length >= 10 && digits.length <= 15) {
+    return "+" + digits;
+  }
+  return "";
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -84,6 +94,7 @@ Return EXACTLY 10 facilities as a JSON array. Each object must have these exact 
 - "provider": the healthcare system name (e.g. "Swedish", "UW Medicine")
 - "status": a short status label like "Shortest Wait", "Level 1 Trauma", "High Volume", "Fast Service", "Open 24/7"
 - "url": a real HTTPS URL for the facility (must start with https://)
+- "phone": a US phone number string for the facility (e.g. "+12065551234" or "206-555-1234") so users can call to verify insurance
 
 Guidelines:
 - Use real facility names and addresses near the given coordinates
@@ -189,6 +200,7 @@ Respond with ONLY the JSON array, no other text.`;
         status: typeof clinic.status === "string" ? clinic.status.slice(0, 40) : "",
         // FIX: Only allow http/https URLs; anything else (e.g. javascript:) becomes empty string
         url: sanitizeClinicUrl(clinic.url),
+        phone: sanitizeClinicPhone(clinic.phone),
       };
     });
 

@@ -9,6 +9,7 @@ export interface Clinic {
   provider: string;
   status: string;
   url: string;
+  phone?: string;
   distance_miles?: number;
 }
 

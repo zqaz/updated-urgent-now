@@ -12,6 +12,7 @@ export const mockERs: Clinic[] = [
     provider: "UW Medicine",
     status: "Level 1 Trauma",
     url: "https://www.uwmedicine.org/locations/harborview-medical-center",
+    phone: "+12067443000",
   },
   {
     id: "er-2",
@@ -24,6 +25,7 @@ export const mockERs: Clinic[] = [
     provider: "Swedish",
     status: "Shortest Wait",
     url: "https://www.swedish.org/locations/first-hill-campus",
+    phone: "+12063866000",
   },
   {
     id: "er-3",
@@ -36,6 +38,7 @@ export const mockERs: Clinic[] = [
     provider: "Virginia Mason",
     status: "High Volume",
     url: "https://www.virginiamason.org/emergency",
+    phone: "+12062236600",
   },
   {
     id: "er-4",
@@ -48,5 +51,6 @@ export const mockERs: Clinic[] = [
     provider: "UW Medicine",
     status: "Academic Center",
     url: "https://www.uwmedicine.org/locations/uw-medical-center",
+    phone: "+12065983300",
   },
 ];

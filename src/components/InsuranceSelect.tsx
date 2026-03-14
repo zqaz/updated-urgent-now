@@ -1,18 +1,20 @@
 import { useState } from "react";
-import { ShieldCheck, ArrowRight, SkipForward, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, ArrowRight, SkipForward, CheckCircle2, Loader2 } from "lucide-react";
 import { INSURANCE_OPTIONS, InsuranceOption } from "@/data/insuranceData";
 
 interface InsuranceSelectProps {
   onSelect: (insuranceId: string) => void;
   onSkip: () => void;
   profileButton?: React.ReactNode;
+  loading?: boolean;
 }
 
-const InsuranceSelect = ({ onSelect, onSkip, profileButton }: InsuranceSelectProps) => {
+const InsuranceSelect = ({ onSelect, onSkip, profileButton, loading = false }: InsuranceSelectProps) => {
   const [selected, setSelected] = useState<string | null>(null);
 
-  const handleConfirm = () => {
-    if (selected) onSelect(selected);
+  const handleConfirm = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (selected && !loading) onSelect(selected);
   };
 
   return (
@@ -75,21 +77,33 @@ const InsuranceSelect = ({ onSelect, onSkip, profileButton }: InsuranceSelectPro
       </div>
 
       {/* Fixed bottom actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border px-4 py-4 z-40">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border px-4 py-4 z-40 safe-area-pb">
         <div className="max-w-lg mx-auto flex flex-col gap-2">
           <button
+            type="button"
             onClick={handleConfirm}
-            disabled={!selected}
-            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3.5 px-4 rounded-xl text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
+            disabled={!selected || loading}
+            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3.5 px-4 rounded-xl text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed shadow-md touch-manipulation"
           >
-            <ArrowRight className="w-4 h-4" />
-            {selected
-              ? `Continue with ${INSURANCE_OPTIONS.find((o) => o.id === selected)?.shortName}`
-              : "Select an insurance to continue"}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading…
+              </>
+            ) : (
+              <>
+                <ArrowRight className="w-4 h-4" />
+                {selected
+                  ? `Continue with ${INSURANCE_OPTIONS.find((o) => o.id === selected)?.shortName}`
+                  : "Select an insurance to continue"}
+              </>
+            )}
           </button>
           <button
+            type="button"
             onClick={onSkip}
-            className="w-full flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors py-2 touch-manipulation disabled:opacity-50"
           >
             <SkipForward className="w-3.5 h-3.5" />
             Skip — show all clinics
